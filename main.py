@@ -1,13 +1,17 @@
 import streamlit as st
 import requests
-try:
-    import moviepy.editor as mp
-except ImportError as e:
-    import streamlit as st
-    st.error(f"MoviePy is not installed or accessible: {e}")
-
+import moviepy.editor as mp
 from datetime import datetime
 import os
+
+def install_moviepy():
+    """Ensure moviepy is installed in the environment."""
+    try:
+        import moviepy.editor as mp  # Try to import it
+    except ImportError:
+        os.system("pip install moviepy")  # Install moviepy if not available
+
+install_moviepy()
 
 def download_twitch_video(twitch_url, output_dir):
     """Download a Twitch video using the provided URL."""
