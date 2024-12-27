@@ -1,7 +1,23 @@
 import streamlit as st
 import subprocess
 import os
-from tiktok_uploader import upload_video  # Certifique-se de que está no requirements.txt
+import sys
+
+def install_package(package_name):
+    """Force install a Python package."""
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+        st.success(f"Successfully installed {package_name}.")
+    except subprocess.CalledProcessError as e:
+        st.error(f"Failed to install {package_name}: {e}")
+        st.stop()
+
+try:
+    from tiktok_uploader import upload_video
+except ImportError:
+    st.warning("Installing TikTok Uploader... This may take a moment.")
+    install_package("tiktok-uploader")
+    from tiktok_uploader import upload_video
 
 def check_ffmpeg_installation():
     """Check if FFmpeg is installed and accessible."""
@@ -10,7 +26,7 @@ def check_ffmpeg_installation():
         st.success("FFmpeg is installed and accessible.")
         st.text(result.stdout.decode())  # Display FFmpeg version
     except FileNotFoundError:
-        st.error("FFmpeg is not installed or not accessible in the system PATH. Make sure to add 'ffmpeg' to the 'packages.txt' file in your project.")
+        st.error("FFmpeg is not installed or not accessible in the system PATH.")
     except Exception as e:
         st.error(f"Unexpected error while checking FFmpeg: {e}")
 
