@@ -44,7 +44,7 @@ def generate_clips(video_path, output_dir, clip_duration):
         st.error(f"Error generating clips: {e}")
 
 # Streamlit app
-st.title("Twitch to TikTok Clip Generator")
+st.title("Twitch Clip Generator")
 
 # Check FFmpeg installation
 check_ffmpeg_installation()
