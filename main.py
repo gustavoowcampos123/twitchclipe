@@ -1,23 +1,7 @@
 import streamlit as st
 import subprocess
 import os
-import sys
-
-def install_package(package_name):
-    """Force install a Python package."""
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
-        st.success(f"Successfully installed {package_name}.")
-    except subprocess.CalledProcessError as e:
-        st.error(f"Failed to install {package_name}: {e}")
-        st.stop()
-
-try:
-    from tiktok_uploader import upload_video
-except ImportError:
-    st.warning("Installing TikTok Uploader... This may take a moment.")
-    install_package("tiktok-uploader")
-    from tiktok_uploader import upload_video
+import time
 
 def check_ffmpeg_installation():
     """Check if FFmpeg is installed and accessible."""
@@ -40,41 +24,39 @@ def cut_video(input_file, output_file, start_time, duration):
     except subprocess.CalledProcessError as e:
         st.error(f"Error while cutting video: {e}")
 
-def upload_to_tiktok(video_path, cookies_path):
-    """Upload video to TikTok using tiktok_uploader."""
+def generate_clips(video_path, output_dir, clip_duration):
+    """Generate clips from a video in intervals."""
     try:
-        st.info(f"Uploading {video_path} to TikTok...")
-        upload_video(video_path, cookies_path)
-        st.success(f"Successfully uploaded {video_path} to TikTok!")
-    except Exception as e:
-        st.error(f"Error uploading video to TikTok: {e}")
+        # Get video duration
+        result = subprocess.run([
+            "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", video_path
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        total_duration = float(result.stdout.strip())
 
-def process_video(video_path, output_dir, clip_duration, cookies_path):
-    base_name = os.path.splitext(os.path.basename(video_path))[0]
-    output_file = os.path.join(output_dir, f"{base_name}_clip.mp4")
-    cut_video(video_path, output_file, start_time=0, duration=clip_duration)
-    upload_to_tiktok(output_file, cookies_path)
-    return output_file
+        clip_count = 0
+        for start_time in range(0, int(total_duration), clip_duration):
+            output_file = os.path.join(output_dir, f"clip_{clip_count}.mp4")
+            cut_video(video_path, output_file, start_time, clip_duration)
+            clip_count += 1
+
+        st.success(f"Generated {clip_count} clips.")
+    except Exception as e:
+        st.error(f"Error generating clips: {e}")
 
 # Streamlit app
-st.title("Twitch to TikTok Cutter and Uploader")
+st.title("Twitch to TikTok Clip Generator")
 
 # Check FFmpeg installation
 check_ffmpeg_installation()
 
 # User input for video processing
 video_path = st.text_input("Enter the path to your video:")
-clip_duration = st.number_input("Clip duration (in seconds):", min_value=1, value=60)
+clip_duration = st.number_input("Clip duration (in seconds):", min_value=1, value=300)  # Default: 5 minutes
 output_dir = "clips"
 os.makedirs(output_dir, exist_ok=True)
 
-# Path to TikTok cookies
-cookies_path = st.text_input("Enter the path to your TikTok cookies file:")
-
-if st.button("Process and Upload Video"):
-    if not video_path or not cookies_path:
-        st.error("Please provide both the video path and TikTok cookies path.")
+if st.button("Generate Clips"):
+    if not video_path:
+        st.error("Please provide the path to the video.")
     else:
-        output_file = process_video(video_path, output_dir, clip_duration, cookies_path)
-        if output_file:
-            st.success(f"Video processed and uploaded successfully: {output_file}")
+        generate_clips(video_path, output_dir, clip_duration)
