@@ -4,21 +4,11 @@ import moviepy.editor as mp
 from datetime import datetime
 import os
 
-def install_moviepy():
-    """Ensure moviepy is installed in the environment."""
-    try:
-        import moviepy.editor as mp  # Try to import it
-    except ImportError:
-        os.system("pip install moviepy")  # Install moviepy if not available
-
-install_moviepy()
-
 def download_twitch_video(twitch_url, output_dir):
-    """Download a Twitch video using the provided URL."""
+    """Simulate download of a Twitch live video."""
     try:
-        # Placeholder for actual download logic using Twitch API or other tools
-        st.info(f"Downloading video from: {twitch_url}")
-        sample_video_path = "sample_twitch_live.mp4"  # Replace with actual download logic
+        # For demonstration purposes, we'll assume the video is locally available
+        sample_video_path = "sample_twitch_live.mp4"
         output_path = os.path.join(output_dir, sample_video_path)
         st.success(f"Video downloaded to {output_path}")
         return output_path
