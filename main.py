@@ -1,22 +1,26 @@
 import streamlit as st
-import streamlit as st
+import subprocess
+import os
 
 def check_ffmpeg_installation():
+    """Check if FFmpeg is installed and accessible."""
     try:
-        subprocess.run(["ffmpeg", "-version"], check=True, capture_output=True)
+        result = subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         st.success("FFmpeg is installed and accessible.")
+        st.text(result.stdout.decode())  # Display FFmpeg version
     except FileNotFoundError:
-        st.error("FFmpeg is not installed on the system. Please ensure it's available.")
-
-check_ffmpeg_installation()
-import os
+        st.error("FFmpeg is not installed or not accessible in the system PATH.")
+    except Exception as e:
+        st.error(f"Unexpected error while checking FFmpeg: {e}")
 
 def cut_video(input_file, output_file, start_time, duration):
     """Cut a video using FFmpeg."""
     try:
-        ffmpeg.input(input_file, ss=start_time, t=duration).output(output_file).run()
+        subprocess.run([
+            "ffmpeg", "-i", input_file, "-ss", str(start_time), "-t", str(duration), "-c:v", "libx264", "-c:a", "aac", output_file
+        ], check=True)
         st.success(f"Clip created: {output_file}")
-    except ffmpeg.Error as e:
+    except subprocess.CalledProcessError as e:
         st.error(f"Error while cutting video: {e}")
 
 def download_twitch_video(twitch_url, output_dir):
@@ -40,8 +44,12 @@ def process_video(twitch_url, output_dir, clip_duration):
         cut_video(video_path, output_file, start_time=0, duration=clip_duration)
         return output_file
     return None
+
 # Streamlit app
 st.title("Twitch to TikTok Cutter and Uploader")
+
+# Check FFmpeg installation
+check_ffmpeg_installation()
 
 # User input for Twitch live URL
 twitch_url = st.text_input("Enter Twitch live URL:")
