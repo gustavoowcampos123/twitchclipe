@@ -1,3 +1,6 @@
 streamlit
 moviepy
 requests
+imageio
+numpy
+Pillow
