@@ -8,7 +8,6 @@ def check_ffmpeg_installation():
     try:
         result = subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         st.success("FFmpeg is installed and accessible.")
-        st.text(result.stdout.decode())  # Display FFmpeg version
     except FileNotFoundError:
         st.error("FFmpeg is not installed or not accessible in the system PATH. Make sure to add 'ffmpeg' to the 'packages.txt' file in your project.")
     except Exception as e:
