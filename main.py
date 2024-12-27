@@ -1,7 +1,7 @@
 import streamlit as st
 import subprocess
 import os
-from tiktok_uploader import upload_video  # Garantir que está instalado via requirements.txt
+from tiktok_uploader import upload_video  # Certifique-se de que está no requirements.txt
 
 def check_ffmpeg_installation():
     """Check if FFmpeg is installed and accessible."""
