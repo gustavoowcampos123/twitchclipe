@@ -5,10 +5,11 @@ from datetime import datetime
 import os
 
 def download_twitch_video(twitch_url, output_dir):
-    """Simulate download of a Twitch live video."""
+    """Download a Twitch video using the provided URL."""
     try:
-        # For demonstration purposes, we'll assume the video is locally available
-        sample_video_path = "sample_twitch_live.mp4"
+        # Placeholder for actual download logic using Twitch API or other tools
+        st.info(f"Downloading video from: {twitch_url}")
+        sample_video_path = "sample_twitch_live.mp4"  # Replace with actual download logic
         output_path = os.path.join(output_dir, sample_video_path)
         st.success(f"Video downloaded to {output_path}")
         return output_path
