@@ -4,7 +4,8 @@ try:
     import moviepy.editor as mp
 except ImportError as e:
     import streamlit as st
-    st.error(f\"MoviePy is not installed or accessible: {e}\")
+    st.error(f"MoviePy is not installed or accessible: {e}")
+
 from datetime import datetime
 import os
 
