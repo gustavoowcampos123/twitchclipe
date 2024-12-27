@@ -1,5 +1,14 @@
 import streamlit as st
-import ffmpeg
+import streamlit as st
+
+def check_ffmpeg_installation():
+    try:
+        subprocess.run(["ffmpeg", "-version"], check=True, capture_output=True)
+        st.success("FFmpeg is installed and accessible.")
+    except FileNotFoundError:
+        st.error("FFmpeg is not installed on the system. Please ensure it's available.")
+
+check_ffmpeg_installation()
 import os
 
 def cut_video(input_file, output_file, start_time, duration):
