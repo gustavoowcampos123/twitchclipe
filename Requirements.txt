@@ -1,6 +1,2 @@
 streamlit
-moviepy
-requests
-imageio
-numpy
-Pillow
+ffmpeg-python
