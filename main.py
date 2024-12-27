@@ -1,7 +1,6 @@
 import streamlit as st
 import subprocess
 import os
-import time
 
 def check_ffmpeg_installation():
     """Check if FFmpeg is installed and accessible."""
@@ -14,12 +13,27 @@ def check_ffmpeg_installation():
     except Exception as e:
         st.error(f"Unexpected error while checking FFmpeg: {e}")
 
+def get_video_duration(video_path):
+    """Get the duration of a video using ffprobe."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", video_path],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        duration = result.stdout.strip()
+        if not duration:
+            raise ValueError("Unable to determine video duration. Please check the video file.")
+        return float(duration)
+    except Exception as e:
+        raise ValueError(f"Error getting video duration: {e}")
+
 def cut_video(input_file, output_file, start_time, duration):
     """Cut a video using FFmpeg."""
     try:
-        subprocess.run([
-            "ffmpeg", "-i", input_file, "-ss", str(start_time), "-t", str(duration), "-c:v", "libx264", "-c:a", "aac", output_file
-        ], check=True)
+        subprocess.run(
+            ["ffmpeg", "-i", input_file, "-ss", str(start_time), "-t", str(duration), "-c:v", "libx264", "-c:a", "aac", output_file],
+            check=True
+        )
         st.success(f"Clip created: {output_file}")
     except subprocess.CalledProcessError as e:
         st.error(f"Error while cutting video: {e}")
@@ -27,21 +41,17 @@ def cut_video(input_file, output_file, start_time, duration):
 def generate_clips(video_path, output_dir, clip_duration):
     """Generate clips from a video in intervals."""
     try:
-        # Get video duration
-        result = subprocess.run([
-            "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", video_path
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        total_duration = float(result.stdout.strip())
-
+        total_duration = get_video_duration(video_path)
         clip_count = 0
         for start_time in range(0, int(total_duration), clip_duration):
             output_file = os.path.join(output_dir, f"clip_{clip_count}.mp4")
             cut_video(video_path, output_file, start_time, clip_duration)
             clip_count += 1
-
         st.success(f"Generated {clip_count} clips.")
+    except ValueError as e:
+        st.error(e)
     except Exception as e:
-        st.error(f"Error generating clips: {e}")
+        st.error(f"Unexpected error generating clips: {e}")
 
 # Streamlit app
 st.title("Twitch Clip Generator")
