@@ -1,4 +1,4 @@
 streamlit
-pip install ffmpeg-python
+ffmpeg-python
 
 
