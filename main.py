@@ -1,7 +1,14 @@
 import streamlit as st
 import subprocess
 import os
-from tiktok_uploader import upload_video
+import sys
+
+try:
+    from tiktok_uploader import upload_video
+except ImportError:
+    st.warning("Installing TikTok Uploader... This may take a moment.")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "tiktok-uploader"])
+    from tiktok_uploader import upload_video
 
 def check_ffmpeg_installation():
     """Check if FFmpeg is installed and accessible."""
