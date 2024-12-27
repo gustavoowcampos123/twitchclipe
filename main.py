@@ -9,7 +9,7 @@ def check_ffmpeg_installation():
         st.success("FFmpeg is installed and accessible.")
         st.text(result.stdout.decode())  # Display FFmpeg version
     except FileNotFoundError:
-        st.error("FFmpeg is not installed or not accessible in the system PATH.")
+        st.error("FFmpeg is not installed or not accessible in the system PATH. Make sure to add 'ffmpeg' to the 'packages.txt' file in your project.")
     except Exception as e:
         st.error(f"Unexpected error while checking FFmpeg: {e}")
 
